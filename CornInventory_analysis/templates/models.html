@@ -1,0 +1,57 @@
+{% extends "base.html" %}{% block title %}Model Evaluation{% endblock %}{% block heading %}Predictive Model Evaluation{% endblock %}{% block content %}
+<div class="page-intro"><h2>Model performance</h2><p>Models are trained on this dataset using the 80/20 train-test split and random_state=42 from your Colab workflow.</p></div>
+<div class="stats two-stats"><div class="stat-card"><div class="stat-top"><span>SVR · RMSE</span><b>∿</b></div><strong>{{ rmse }}</strong><small>Regression error on held-out test data</small></div><div class="stat-card"><div class="stat-top"><span>SVR · R² score</span><b>R²</b></div><strong>{{ r2 }}</strong><small>Regression goodness-of-fit score</small></div></div>
+<div class="panel"><div class="panel-head"><div><h3>Classification model comparison</h3><p>High inventory means above the dataset median</p></div></div><div class="table-scroll"><table><thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1-score</th><th>AUC</th></tr></thead><tbody>{% for m in metrics %}<tr><td><b>{{ m.model }}</b></td><td>{{ '%.2f'|format(m.accuracy*100) }}%</td><td>{{ '%.2f'|format(m.precision*100) }}%</td><td>{{ '%.2f'|format(m.recall*100) }}%</td><td>{{ '%.2f'|format(m.f1*100) }}%</td><td>{{ '%.4f'|format(m.auc) }}</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="panel"><div class="panel-head"><div><h3>ROC curves</h3><p>Each algorithm has its own color to make the model lines easy to identify. The diagonal line represents random guessing.</p></div></div><div class="roc-legend">
+<span class="roc-key"><i style="background:#D9A514"></i>Naive Bayes</span>
+<span class="roc-key"><i style="background:#2F7D4A"></i>Logistic Regression</span>
+<span class="roc-key"><i style="background:#3478B8"></i>Decision Tree</span>
+<span class="roc-key"><i style="background:#8B5CB8"></i>Random Forest</span>
+<span class="roc-key"><i style="background:#9AA49C"></i>Random guessing</span>
+</div><div class="chart-wrap tall"><canvas id="roc"></canvas></div></div>
+<div class="grid-two">{% for name,cm in matrices.items() %}<div class="panel"><div class="panel-head"><div><h3>{{ name }} · Confusion matrix</h3><p>Actual rows × predicted columns</p></div></div><div class="matrix"><div></div><div class="matrix-label">Predicted Low</div><div class="matrix-label">Predicted High</div><div class="matrix-label">Actual Low</div><div class="matrix-cell">{{ cm[0][0] }}</div><div class="matrix-cell">{{ cm[0][1] }}</div><div class="matrix-label">Actual High</div><div class="matrix-cell">{{ cm[1][0] }}</div><div class="matrix-cell">{{ cm[1][1] }}</div></div></div>{% endfor %}</div>
+<script>
+const roc={{ roc_json|safe }};
+const algorithmColors={
+  'Naive Bayes':'#D9A514',
+  'Logistic Regression':'#2F7D4A',
+  'Decision Tree':'#3478B8',
+  'Random Forest':'#8B5CB8'
+};
+const datasets=Object.entries(roc).map(([name,v])=>({
+  label:name+' (AUC '+v.auc.toFixed(3)+')',
+  data:v.fpr.map((x,i)=>({x,y:v.tpr[i]})),
+  borderColor:algorithmColors[name] || '#315B35',
+  backgroundColor:algorithmColors[name] || '#315B35',
+  borderWidth:3,
+  pointRadius:0,
+  pointHoverRadius:4,
+  tension:0,
+  fill:false
+}));
+datasets.push({
+  label:'Random guessing',
+  data:[{x:0,y:0},{x:1,y:1}],
+  borderDash:[7,6],
+  borderColor:'#9AA49C',
+  backgroundColor:'#9AA49C',
+  borderWidth:2,
+  pointRadius:0
+});
+new Chart(document.getElementById('roc'),{
+  type:'line',
+  data:{datasets},
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    parsing:false,
+    interaction:{mode:'nearest',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:10,padding:16}}},
+    scales:{
+      x:{type:'linear',min:0,max:1,title:{display:true,text:'False Positive Rate'}},
+      y:{min:0,max:1,title:{display:true,text:'True Positive Rate'}}
+    }
+  }
+});
+</script>
+{% endblock %}

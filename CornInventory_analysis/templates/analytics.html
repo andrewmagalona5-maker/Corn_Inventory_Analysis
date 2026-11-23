@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Analytics{% endblock %}{% block heading %}Data Analytics{% endblock %}{% block content %}
+<div class="page-intro"><h2>Explore the dataset</h2><p>Descriptive visualizations based on the uploaded structured numerical CSV.</p></div>
+<div class="grid-two"><div class="panel"><div class="panel-head"><div><h3>Average inventory by sector</h3><p>Sector-level mean inventory</p></div></div><div class="chart-wrap"><canvas id="avg"></canvas></div></div>
+<div class="panel"><div class="panel-head"><div><h3>Inventory distribution</h3><p>Distribution of recorded inventory values</p></div></div><div class="chart-wrap"><canvas id="hist"></canvas></div></div></div>
+<div class="panel"><div class="panel-head"><div><h3>Sector inventory range</h3><p>Minimum and maximum recorded values by sector</p></div></div><div class="chart-wrap"><canvas id="range"></canvas></div></div>
+<script>
+const labels={{ labels|tojson }}, means={{ means|tojson }}, mins={{ mins|tojson }}, maxs={{ maxs|tojson }}, values={{ values|tojson }};
+new Chart(document.getElementById('avg'),{type:'bar',data:{labels,datasets:[{label:'Average',data:means,backgroundColor:'#78865a',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false}});
+const bins=18, min=Math.min(...values), max=Math.max(...values), step=(max-min)/bins || 1, counts=Array(bins).fill(0);
+values.forEach(v=>counts[Math.min(bins-1,Math.floor((v-min)/step))]++);
+new Chart(document.getElementById('hist'),{type:'bar',data:{labels:counts.map((_,i)=>Math.round(min+i*step).toLocaleString()),datasets:[{label:'Records',data:counts,backgroundColor:'#d9c56e'}]},options:{responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('range'),{type:'bar',data:{labels,datasets:[{label:'Minimum',data:mins,backgroundColor:'#b7c09a'},{label:'Maximum',data:maxs,backgroundColor:'#78865a'}]},options:{responsive:true,maintainAspectRatio:false}});
+</script>{% endblock %}

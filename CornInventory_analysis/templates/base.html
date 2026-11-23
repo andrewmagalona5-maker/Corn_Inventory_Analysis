@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Corn Inventory{% endblock %} | Corn Inventory</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head><body>
+<div class="layout"><aside class="sidebar"><div class="brand"><div class="brand-icon">🌽</div><div><b>Corn Inventory</b><small>Farm Inventory Management</small></div></div>
+<nav><span class="nav-label">WORKSPACE</span>
+<a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' else '' }}">▦ <span>Dashboard</span></a>
+<a href="{{ url_for('analytics') }}" class="{{ 'active' if request.endpoint=='analytics' else '' }}">◫ <span>Data Analytics</span></a>
+<a href="{{ url_for('models_page') }}" class="{{ 'active' if request.endpoint=='models_page' else '' }}">⌁ <span>Model Evaluation</span></a>
+<a href="{{ url_for('forecast') }}" class="{{ 'active' if request.endpoint=='forecast' else '' }}">↗ <span>Forecast 2026–2030</span></a>
+<span class="nav-label">DATA</span><a href="{{ url_for('records') }}" class="{{ 'active' if request.endpoint=='records' else '' }}">▤ <span>Inventory Records</span></a>
+<a href="{{ url_for('upload') }}" class="{{ 'active' if request.endpoint=='upload' else '' }}">⇧ <span>Upload Dataset</span></a>
+<a href="{{ url_for('download') }}">⇩ <span>Download CSV</span></a></nav>
+<div class="sidebar-bottom"><div class="status-dot"></div><span>Local analytics environment</span></div></aside>
+<main class="main"><header class="topbar"><div><span class="eyebrow">AGRICULTURAL DATA PLATFORM</span><h1>{% block heading %}Overview{% endblock %}</h1></div><div class="top-right"><span class="live"><i></i> DATA CONNECTED</span><div class="avatar">CS</div></div></header>
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category,message in messages %}<div class="flash {{category}}">{{message}}</div>{% endfor %}{% endif %}{% endwith %}
+<section class="content">{% block content %}{% endblock %}</section><footer> Corn Inventory · Structured Corn Dataset · Farm Inventory Dashboard</footer></main></div>
+</body></html>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}{% block heading %}Inventory Overview{% endblock %}
+{% block content %}
+<div class="welcome"><div><div class="eyebrow light">CORN INVENTORY MONITORING</div><h2>Understand your inventory.<br><em>Plan with better insights.</em></h2><p>Explore structured corn inventory records, compare sectors, and review machine learning results.</p></div><div class="corn-art">🌽</div></div>
+<div class="stats">
+<div class="stat-card"><div class="stat-top"><span>Total recorded inventory</span><b>Σ</b></div><strong>{{ total }}</strong><small>Sum of all inventory values</small></div>
+<div class="stat-card"><div class="stat-top"><span>Average inventory</span><b>◉</b></div><strong>{{ average }}</strong><small>Average per dataset record</small></div>
+<div class="stat-card"><div class="stat-top"><span>Dataset records</span><b>▤</b></div><strong>{{ "{:,}".format(records) }}</strong><small>Structured observations</small></div>
+<div class="stat-card"><div class="stat-top"><span>Latest year</span><b>◷</b></div><strong>{{ latest_year }}</strong><small>Latest year in the dataset</small></div></div>
+<div class="grid-two">
+<div class="panel"><div class="panel-head"><div><h3>Yearly inventory trend</h3><p>Total inventory across all sectors and months</p></div><span class="chip">2000–{{ latest_year }}</span></div><div class="chart-wrap"><canvas id="yearChart"></canvas></div></div>
+<div class="panel"><div class="panel-head"><div><h3>Average by sector</h3><p>Mean inventory value for each sector code</p></div></div><div class="chart-wrap"><canvas id="sectorChart"></canvas></div></div>
+</div>
+<div class="panel"><div class="panel-head"><div><h3>Monthly inventory profile</h3><p>Average inventory by calendar month</p></div></div><div class="chart-wrap short"><canvas id="monthChart"></canvas></div></div>
+<div class="note"><b>Classification threshold</b><span>High inventory is defined as a value above the dataset median: <strong>{{ median }}</strong>. This follows the target definition in your Colab notebook.</span></div>
+<script>
+const years={{ years|tojson }}, yearly={{ yearly_values|tojson }};
+const sectorLabels={{ sector_labels|tojson }}, sectorValues={{ sector_values|tojson }};
+const monthLabels={{ month_labels|tojson }}, monthValues={{ month_values|tojson }};
+const grid='#ece9d9', green='#78865a';
+new Chart(document.getElementById('yearChart'),{type:'line',data:{labels:years,datasets:[{label:'Inventory',data:yearly,borderColor:green,backgroundColor:'rgba(38,115,77,.12)',fill:true,tension:.3,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:grid}},x:{grid:{display:false}}}}});
+new Chart(document.getElementById('sectorChart'),{type:'bar',data:{labels:sectorLabels,datasets:[{label:'Average inventory',data:sectorValues,backgroundColor:['#78865a','#aab58a','#e4c75c'],borderRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:grid}},x:{grid:{display:false}}}}});
+new Chart(document.getElementById('monthChart'),{type:'bar',data:{labels:monthLabels,datasets:[{label:'Average inventory',data:monthValues,backgroundColor:'#b5bd91',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:grid}},x:{grid:{display:false}}}}});
+</script>{% endblock %}

@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}Data Error{% endblock %}{% block heading %}Unable to load dashboard{% endblock %}{% block content %}<div class="panel"><h3>Dataset or model error</h3><p>{{ error }}</p><p>Check that the CSV contains Sector, Year, Month, and Corn_Inventory columns.</p></div>{% endblock %}
